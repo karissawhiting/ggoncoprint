@@ -1,6 +1,6 @@
 threshold <- .05
 
-order <- get_gene_order(alterations_data)
+order <- get_gene_order(alteration_data)
 
 order_perc <- order %>%
   mutate(perc = n/nrow(alteration_data))
@@ -8,7 +8,7 @@ order_perc <- order %>%
 order_trunc <- order_perc %>%
   filter(perc >= threshold)
 
-alterations_data2 <- alterations_data %>%
+alterations_data2 <- alteration_data %>%
   select(sample_id, contains(order_trunc$gene))
 
 alterations_data2 <- sort_patients(alterations_data2)
