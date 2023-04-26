@@ -73,7 +73,7 @@ calculate_patient_score <- function(x) {
 #' @export
 #'
 #' @examples
-get_gene_order <- function(alteration_df) {
+get_gene_order <- function(alteration_df, threshold = 0.1) {
 
   alteration_df <- alteration_df %>%
     gnomeR::rename_columns(.)

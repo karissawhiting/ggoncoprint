@@ -2,24 +2,27 @@
 
 geom_oncogrid <- function(plot_data) {
 
+
   base_data <- create_base_data(plot_data)
 
-  base_data  %>%
+  plot_data  %>%
+    filter(!is.na(gene_order))%>%
     ggplot() +
-    geom_tile(aes(x = order_id, y = gene), fill = "lightgrey", color = "white", linewidth = 2) +
-    geom_tile(data = filter(plot_data, value == "Amplification"),
+    geom_tile(aes(x = order_id, y = gene_order), fill = "lightgrey", color = "white", linewidth = 2)+
+    geom_tile(data = plot_data %>% filter(missing_all_types == 0),
+              aes(x = order_id, y = gene_order), fill = "lightgrey")+
+    geom_tile(data = filter(plot_data, missing_all))
+    geom_tile(data = filter(plot_data, type_alt == "Amplification"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
-              color = "white",
               size = 1) +
 
-    geom_tile(data = filter(plot_data, value == "Deletion"),
+    geom_tile(data = filter(plot_data, type_alt == "Deletion"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
-              color = "white",
               size = 1) +
 
-    geom_tile(data = filter(plot_data, value == "Mutation"),
+    geom_tile(data = filter(plot_data,  type_alt == "Mutation"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
               height = .5,
@@ -27,13 +30,13 @@ geom_oncogrid <- function(plot_data) {
               color = "white",
               size = .1) +
 
-    geom_tile(data = filter(plot_data, value == "Fusion"),
+    geom_tile(data = filter(plot_data, type_alt == "Fusion"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
               height = .5,
               width = 1,
               color = "white",
-              size = .1) +
+              size = .1)+
     scale_x_continuous(expand = c(0,0)) +
     # theme(legend.position = "left") +
     theme(
