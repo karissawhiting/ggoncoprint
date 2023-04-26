@@ -9,9 +9,6 @@ geom_oncogrid <- function(plot_data) {
     filter(!is.na(gene_order))%>%
     ggplot() +
     geom_tile(aes(x = order_id, y = gene_order), fill = "lightgrey", color = "white", linewidth = 2)+
-    geom_tile(data = plot_data %>% filter(missing_all_types == 0),
-              aes(x = order_id, y = gene_order), fill = "lightgrey")+
-    geom_tile(data = filter(plot_data, missing_all))
     geom_tile(data = filter(plot_data, type_alt == "Amplification"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
