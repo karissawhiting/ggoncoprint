@@ -9,8 +9,8 @@ geom_oncogrid <- function(plot_data) {
     filter(!is.na(gene_order))%>%
     ggplot() +
     geom_tile(aes(x = order_id, y = gene_order), fill = "lightgrey", color = "white", linewidth = 2)+
-    geom_tile(data = filter(plot_data, na_on_panel == 1), aes(x = order_id, y = gene_order), fill = 'lightgrey', color = 'white', linewidth = 2)+
-
+    geom_tile(data = filter(plot_data, is.na(value)), aes(x = order_id, y = gene_order),
+              fill = 'lightgrey', linewidth = 2)+
     geom_tile(data = filter(plot_data, type_alt == "Amplification"),
               aes(order_id, gene, fill = alt),
               alpha = .7,
@@ -42,7 +42,8 @@ geom_oncogrid <- function(plot_data) {
       axis.title.x = element_blank(),
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank(),
-      plot.margin = margin(0, 0, 0, 0, "pt"))
+      plot.margin = margin(0, 0, 0, 0, "pt"))+
+    scale_fill_discrete(name = "Alteration")
 
 
 }
