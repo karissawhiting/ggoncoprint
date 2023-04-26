@@ -30,6 +30,7 @@ sort_patients <- function(alteration_df) {
 
   }
 
+  ################################################# HERE
   scores <- apply(select(alteration_df, -c('original_order')), 1, calculate_patient_score)
   sample_order <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
 
@@ -73,7 +74,7 @@ calculate_patient_score <- function(x) {
 #' @export
 #'
 #' @examples
-get_gene_order <- function(alteration_df) {
+get_gene_order <- function(alteration_df, threshold = 0.1) {
 
   alteration_df <- alteration_df %>%
     gnomeR::rename_columns(.)
