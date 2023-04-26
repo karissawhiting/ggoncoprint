@@ -30,6 +30,7 @@ sort_patients <- function(alteration_df) {
 
   }
 
+  ################################################# HERE
   scores <- apply(select(alteration_df, -c('original_order')), 1, calculate_patient_score)
   sample_order <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
 

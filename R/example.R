@@ -30,4 +30,3 @@ p_tmb + p_sp + p_oncogrid + p_gene_freq+
     heights = c(.5, 2))
 p_oncogrid + p_gene_freq
 
-
