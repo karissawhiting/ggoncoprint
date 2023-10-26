@@ -1,9 +1,16 @@
 
-geom_gene_col <- function(gene_freq_df) {
+geom_gene_col <- function(gene_binary) {
 
-  order_trunc %>%
-    mutate(gene = forcats::fct_reorder(gene, n)) %>%
-    ggplot(aes(x = gene, y = perc, fill = perc)) +
+
+  gene_perc_df <- gene_binary %>%
+    get_gene_order()
+
+  gene_perc_df <- data.frame(gene = names(gene_perc_df),
+                             perc = gene_perc_df)
+
+  gene_perc_df %>%
+    mutate(gene = factor(gene, levels = rev(gene)))%>%
+    ggplot(aes(x = gene, y = perc)) +
     geom_col() +
     theme_classic() +
     coord_flip() +
@@ -16,7 +23,7 @@ geom_gene_col <- function(gene_freq_df) {
       axis.line = element_blank(),
       plot.margin = margin(0, 0, 0, 0, "pt")) +
 
-    scale_y_discrete(expand = c(0,0)) +
+    scale_y_continuous(expand = c(0,0), limits = c(0,1)) +
 
     guides(fill="none") +
 

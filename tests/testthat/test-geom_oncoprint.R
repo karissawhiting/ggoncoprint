@@ -14,7 +14,7 @@ test_that("NAs work", {
                                                        ZNRF3 = rep(1, nrow(alteration_data))))
 
 
-  plot_data <- .prep_data_long(alteration_data, threshold = 0.05)
+  plot_data <- .prep_data_long(alteration_data)
 
   p_oncogrid <- geom_oncogrid(plot_data)
 
