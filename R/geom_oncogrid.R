@@ -2,6 +2,7 @@
 
 geom_oncogrid <- function(plot_data) {
 
+  plot_data <- .prep_data_long(genie_nsclc_data)
 
   base_data <- create_base_data(plot_data)
 

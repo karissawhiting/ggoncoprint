@@ -1,7 +1,7 @@
 # library(cbioportalR)
 # library(tidyverse)
 #
-# plot_data <- .prep_data_long(genie_nsclc_data)
+#
 #
 # # check here next time
 # p_oncogrid <- geom_oncogrid(plot_data)
