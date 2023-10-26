@@ -4,7 +4,7 @@
 #
 #
 # # check here next time
-# p_oncogrid <- geom_oncogrid(plot_data)
+# p_oncogrid <- geom_oncogrid(genie_nsclc_data)
 #
 # p_gene_freq <- geom_gene_col(plot_data)
 #
