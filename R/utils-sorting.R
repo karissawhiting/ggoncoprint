@@ -1,46 +1,30 @@
 
-#' Title
+#' Sort patients by number of mutations
 #'
-#' @param alteration_df
+#' Most mutations at the top to least at the bottom
+#'
+#' @param gene_binary
 #'
 #' @return
 #' @export
 #'
 #' @examples
-sort_patients <- function(alteration_df) {
+sort_patients <- function(gene_binary) {
 
-  alteration_df_raw <- alteration_df %>%
+
+  gene_binary2 <- gene_binary %>%
     gnomeR::rename_columns(.)
 
-  alteration_df_raw <- alteration_df_raw %>%
-    mutate(original_order = 1:nrow(.))
-
-  alteration_df <- alteration_df_raw
-
-  index_df <- alteration_df %>%
-    select(original_order)
-
-  if("sample_id" %in% colnames(alteration_df)) {
-
-    index_df <- alteration_df %>%
-      select(sample_id, original_order)
-
-    alteration_df <- alteration_df %>%
-      select(-c(sample_id))
-
+  if(!("sample_id" %in% names(gene_binary2))){
+    cli::cli_abort("sample_id column is missing.")
   }
 
-  scores <- apply(select(alteration_df, -c('original_order')), 1, calculate_patient_score)
-  sample_order <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
-
-  alteration_df <- alteration_df[sample_order, ]
-
-  alteration_df <-  alteration_df %>%
-    left_join(index_df, alteration_df,
-              by = "original_order") %>%
-    select(-original_order) %>%
-    mutate(order_id = 1:nrow(.)) %>%
-    select(sample_id, order_id, everything())
+  alteration_df <- gene_binary2 %>%
+    rowwise()%>%
+    mutate(
+           alt_num = sum(c_across(is.numeric), na.rm = T))%>%
+    arrange(desc(alt_num))%>%
+    select(-alt_num)
 
   return(alteration_df)
 }
@@ -50,43 +34,57 @@ sort_patients <- function(alteration_df) {
 #'
 #' @param x
 #'
+#'  https://gist.github.com/dakl/5974ac1d78dac88c1c78
 #' @return
 #' @export
 #'
 #' @examples
-calculate_patient_score <- function(x) {
-  x <- na.omit(x)
-  score <- 0;
-  for(i in 1:length(x)) {
-    if(x[i]) {
-      score <- score + 2^(length(x)-i)
+calc_gene_scores <- function(gene) {
+  col_values <- na.omit(gene)
+  score <- 0
+
+  score <- sum(purrr::imap_dbl(col_values, function(x, idx){
+    if(x == 1){ #if mutated
+      2^(length(col_values) - idx)
+    } else {
+      NA
     }
-  }
+  }), na.rm = T)
+
   return(score)
 }
 
-#' Title
+#' Order genes based on mutational frequency
 #'
-#' @param alteration_df
+#' @param gene_binary
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_gene_order <- function(alteration_df) {
+sort_genes <- function(gene_binary) {
 
-  alteration_df <- alteration_df %>%
-    gnomeR::rename_columns(.)
+  alt_only <- gene_binary %>%
+    select(-"sample_id")
+  # Remove all NA columns ----------------------------------------------
+  # all names but sample_id
+  all_na_alt <- apply(alt_only,  2, function(x) {
+    sum(is.na(x)) == nrow(gene_binary)
+  })
 
-  sum_bm <- alteration_df %>%
-    gnomeR::summarize_by_gene()
+  all_non_na_alt <- names(all_na_alt[!all_na_alt])
+  alt_only <- select(alt_only, all_of(all_non_na_alt))
 
+  gene_order <- purrr::map(alt_only, calc_gene_scores)%>%
+    unlist()%>%
+    sort(., decreasing = T)%>%
+    names(.)
 
-  # order genes by frequency
-  gene_freq <- colSums(select(sum_bm, -sample_id), na.rm = TRUE) %>%
-    sort(., decreasing = TRUE) %>%
-    tibble::enframe("gene", "n")
+  sorted_binary <- gene_binary %>%
+    select(sample_id, all_of(names(alt_only)))
 
-  return(gene_freq)
+  sorted_binary <- sorted_binary[, c("sample_id", gene_order)]
+
+  return(sorted_binary)
 }
 
